@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv Dars — Animatsiya effektini qo‘shish</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+    min-height: 100vh;
+    padding: 28px 20px;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  /* Sahifalarni boshqaruvchi yashirin radio tugmalar */
+  .page-radio {
+    display: none;
+  }
+
+  /* Barcha ichki sahifalar avval yashiriladi */
+  .page-view {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Tanlangan sahifani ko'rsatish */
+  #p-home:checked ~ .page-wrapper #view-home,
+  #p-rej1:checked ~ .page-wrapper #view-rej1,
+  #p-rej2:checked ~ .page-wrapper #view-rej2,
+  #p-rej3:checked ~ .page-wrapper #view-rej3 {
+    display: block;
+  }
+
+  /* Bosh sahifa sarlavhasi */
+  .home-header {
+    text-align: center;
+    margin-bottom: 35px;
+    padding: 26px 22px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid #334155;
+    border-radius: 20px;
+  }
+  .home-badge {
+    display: inline-block;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    padding: 6px 18px;
+    border-radius: 50px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .home-header h1 {
+    font-size: 28px;
+    color: #38bdf8;
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .home-header p {
+    font-size: 17px;
+    color: #cbd5e1;
+  }
+
+  /* Bosh sahifadagi 3 ta reja kartochkasi */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .plan-card {
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 18px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+    border-top: 7px solid #0284c7;
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    user-select: none;
+  }
+  .plan-card.card-2 {
+    border-top-color: #10b981;
+  }
+  .plan-card.card-3 {
+    border-top-color: #f59e0b;
+  }
+  .plan-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 45px rgba(2, 132, 199, 0.35);
+  }
+  .plan-num {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 800;
+    font-size: 15px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .card-2 .plan-num {
+    background: #d1fae5;
+    color: #047857;
+  }
+  .card-3 .plan-num {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  .plan-card h2 {
+    font-size: 19px;
+    line-height: 1.4;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+  .plan-card .desc {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+  .go-btn {
+    display: block;
+    text-align: center;
+    background: #0284c7;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 13px 16px;
+    border-radius: 10px;
+  }
+  .card-2 .go-btn {
+    background: #059669;
+  }
+  .card-3 .go-btn {
+    background: #d97706;
+  }
+
+  /* Ichki sahifalar yuqori paneli */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .back-btn {
+    background: #334155;
+    color: #ffffff;
+    border: 2px solid #64748b;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+  }
+  .back-btn:hover {
+    background: #0284c7;
+    border-color: #7dd3fc;
+  }
+  .quick-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .quick-btn {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    padding: 10px 16px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .quick-btn:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+  }
+
+  /* Ichki sahifa asosiy kartochkasi */
+  .sub-card {
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 18px;
+    padding: 32px 36px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+  }
+  .sub-card h2 {
+    font-size: 24px;
+    color: #0284c7;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  /* 1-reja ichidagi ichki bo'limlar (JS siz) */
+  .sub-radio {
+    display: none;
+  }
+  .topic-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .topic-tab {
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 15px 14px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .topic-tab:hover {
+    border-color: #0284c7;
+    background: #e0f2fe;
+  }
+  #t-maqsad1:checked ~ .topic-tabs label[for="t-maqsad1"],
+  #t-maqsad2:checked ~ .topic-tabs label[for="t-maqsad2"] {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+  }
+  .topic-box {
+    display: none;
+  }
+  #t-maqsad1:checked ~ .topic-panels #tp-maqsad1,
+  #t-maqsad2:checked ~ .topic-panels #tp-maqsad2 {
+    display: block;
+  }
+
+  /* 2-reja ichidagi bo'limlar (JS siz) */
+  .conf-radio {
+    display: none;
+  }
+  .conf-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .conf-tab {
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 15px 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .conf-tab:hover {
+    border-color: #059669;
+    background: #d1fae5;
+  }
+  #c-turlar:checked ~ .conf-tabs label[for="c-turlar"],
+  #c-variant:checked ~ .conf-tabs label[for="c-variant"],
+  #c-sozlama:checked ~ .conf-tabs label[for="c-sozlama"] {
+    background: #059669;
+    color: #ffffff;
+    border-color: #059669;
+  }
+  .conf-box {
+    display: none;
+  }
+  #c-turlar:checked ~ .conf-panels #cp-turlar,
+  #c-variant:checked ~ .conf-panels #cp-variant,
+  #c-sozlama:checked ~ .conf-panels #cp-sozlama {
+    display: block;
+  }
+
+  /* Matn bloklari */
+  .info-def {
+    background: #f0f9ff;
+    border-left: 5px solid #0284c7;
+    padding: 16px 20px;
+    font-size: 18px;
+    line-height: 1.6;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+  .info-list {
+    margin: 12px 0 18px 24px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: #334155;
+  }
+  .info-list li {
+    margin-bottom: 9px;
+  }
+  .info-ex {
+    background: #fefce8;
+    border-left: 5px solid #eab308;
+    padding: 15px 18px;
+    font-size: 17px;
+    line-height: 1.55;
+    border-radius: 8px;
+    color: #422006;
+  }
+  .info-tip {
+    margin-top: 14px;
+    background: #ecfdf5;
+    border-left: 5px solid #10b981;
+    padding: 14px 18px;
+    font-size: 16px;
+    line-height: 1.5;
+    border-radius: 8px;
+    color: #064e3b;
+  }
+
+  table.diff-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 18px;
+    font-size: 16px;
+  }
+  table.diff-tbl th, table.diff-tbl td {
+    border: 1px solid #cbd5e1;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  table.diff-tbl th {
+    background: #059669;
+    color: #ffffff;
+  }
+  table.diff-tbl tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  /* 3-reja (Uyga vazifa) stillari */
+  .hw-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #b45309;
+    border: 2px solid #f59e0b;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 6px 18px;
+    border-radius: 50px;
+    margin-bottom: 18px;
+  }
+  .hw-box {
+    background: #fffbeb;
+    border-left: 7px solid #f59e0b;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 24px;
+    line-height: 1.55;
+    color: #0f172a;
+    margin-bottom: 24px;
+  }
+  .hw-pages {
+    background: #0284c7;
+    color: #ffffff;
+    padding: 2px 12px;
+    border-radius: 7px;
+    font-weight: bold;
+  }
+  .hw-muhr {
+    color: #b45309;
+    font-weight: 800;
+    text-decoration: underline;
+  }
+  .hw-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .hw-step {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .hw-step h4 {
+    color: #0284c7;
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+  .hw-step p {
+    color: #334155;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 850px) {
+    .plans-grid, .conf-tabs, .topic-tabs, .hw-steps {
+      grid-template-columns: 1fr;
+    }
+    .hw-box {
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- SAHIFALARNI ALMASHTIRUVCHI TUGMALAR -->
+  <input type="radio" name="mainpage" id="p-home" class="page-radio" checked>
+  <input type="radio" name="mainpage" id="p-rej1" class="page-radio">
+  <input type="radio" name="mainpage" id="p-rej2" class="page-radio">
+  <input type="radio" name="mainpage" id="p-rej3" class="page-radio">
+
+  <div class="page-wrapper">
+
+    <!-- ==================== BOSH SAHIFA ==================== -->
+    <div id="view-home" class="page-view">
+      <div class="home-header">
+        <div class="home-badge">📘 2-MODUL: MULTIMEDIADAN MAQSADLI FOYDALANISH | II-CHORAK, 3-MAVZU</div>
+        <h1>ANIMATSIYA EFFEKTINI QO‘SHISH</h1>
+        <p>Darslik: 45–47-sahifalar — Kerakli bo‘limga o‘tish uchun quyidagi 3 ta rejadan birining ustiga bosing</p>
+      </div>
+
+      <div class="plans-grid">
+        <!-- 1-REJA KARTASI -->
+        <label for="p-rej1" class="plan-card card-1">
+          <div>
+            <span class="plan-num">1-REJA</span>
+            <h2>SLAYD ANIMATSIYASIDAN IKKI MAQSADDA FOYDALANISH</h2>
+            <p class="desc">Taqdimotda animatsiya effektlarini maqsadli qo‘llashning ikki asosiy vazifasi: diqqatni jalb qilish va axborotni bosqichma-bosqich yetkazish.</p>
+          </div>
+          <span class="go-btn">1-rejaga o‘tish →</span>
+        </label>
+
+        <!-- 2-REJA KARTASI -->
+        <label for="p-rej2" class="plan-card card-2">
+          <div>
+            <span class="plan-num">2-REJA</span>
+            <h2>SLAYD ANIMATSIYASINING TURLARI VA VARIANTLARI</h2>
+            <p class="desc">Kirish, ajratib ko‘rsatish, chiqish va harakat yo‘li animatsiya turlari hamda ularning yo‘nalish va tezlik variantlari.</p>
+          </div>
+          <span class="go-btn">2-rejaga o‘tish →</span>
+        </label>
+
+        <!-- 3-REJA KARTASI -->
+        <label for="p-rej3" class="plan-card card-3">
+          <div>
+            <span class="plan-num">3-REJA</span>
+            <h2>UYGA VAZIFA: 45–47-SAHIFALAR</h2>
+            <p class="desc">Kitobingizni 45–47-sahifalarida berilgan mavzuni to‘liq o‘qib-o‘rganib tushunganingizni daftaringizga yozib muhrlang.</p>
+          </div>
+          <span class="go-btn">3-rejaga o‘tish →</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ==================== 1-REJA SAHIFASI ==================== -->
+    <div id="view-rej1" class="page-view">
+      <div class="top-bar">
+        <label for="p-home" class="back-btn">← Bosh sahifa</label>
+        <div class="quick-nav">
+          <label for="p-rej2" class="quick-btn">2-reja: Turlari va variantlari →</label>
+          <label for="p-rej3" class="quick-btn">3-reja: Uyga vazifa →</label>
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <h2>1-reja: Slayd animatsiyasidan ikki maqsadda foydalanish</h2>
+
+        <input type="radio" name="t1" id="t-maqsad1" class="sub-radio" checked>
+        <input type="radio" name="t1" id="t-maqsad2" class="sub-radio">
+
+        <div class="topic-tabs">
+          <label for="t-maqsad1" class="topic-tab">🎯 1-MAQSAD: DIQQAT VA TARTIB (AXBOROTNI BOSQICHMA-BOSQICH BERISH)</label>
+          <label for="t-maqsad2" class="topic-tab">💡 2-MAQSAD: MA’NONI KUCHAYTIRISH VA JARAYONNI TUSHUNTIRISH</label>
+        </div>
+
+        <div class="topic-panels">
+          <!-- 1-ichki bo'lim: 1-maqsad -->
+          <div id="tp-maqsad1" class="topic-box">
+            <div class="info-def">
+              <b>1-maqsad:</b> Tinglovchilar e’tiborini kerakli nuqtaga qaratish va matn yoki obyektlarni birvarakayiga emas, balki <b>bosqichma-bosqich (ketma-ket)</b> ko‘rsatish.
+            </div>
+            <ol class="info-list">
+              <li>Barcha fikrlar bir vaqtda ekranga chiqib ketsa, tinglovchi chalg‘ib, keyingi satrni o‘qishga shoshiladi.</li>
+              <li>Animatsiya yordamida har bir band tushuntirilayotgan paytda ekranga chiqariladi.</li>
+              <li>Bu o‘quvchi yoki tinglovchining fikrini so‘zlovchi bilan bir maromda ushlab turadi.</li>
+            </ol>
+            <div class="info-ex">
+              <b>Misol:</b> Dars rejasining 3 ta bandini birin-ketin chiqarish orqali har bir reja alohida muhokama qilinadi.
+            </div>
+          </div>
+
+          <!-- 2-ichki bo'lim: 2-maqsad -->
+          <div id="tp-maqsad2" class="topic-box">
+            <div class="info-def">
+              <b>2-maqsad:</b> Muhim g‘oya yoki jarayonning mazmunini ko‘rgazmali tarzda <b>tushuntirish va ta’kidlash</b> (bezak uchun emas, balki mazmunni boyitish uchun).
+            </div>
+            <ul class="info-list">
+              <li>Jarayon qanday sodir bo‘lishi (harakat, o‘zgarish, bog‘lanish) harakat orqali ko‘rsatiladi.</li>
+              <li>Eng muhim so‘z, ko‘rsatkich yoki natija alohida ajratib ko‘rsatiladi.</li>
+              <li>Ortiqcha va chalg‘ituvchi effektlardan voz kechiladi.</li>
+            </ul>
+            <div class="info-tip">
+              <b>💡 Muhim qoida:</b> Animatsiya taqdimot mazmuniga xizmat qilishi kerak — har bir slaydga haddan ko‘p effekt qo‘shish diqqatni susaytiradi.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 2-REJA SAHIFASI ==================== -->
+    <div id="view-rej2" class="page-view">
+      <div class="top-bar">
+        <label for="p-home" class="back-btn">← Bosh sahifa</label>
+        <div class="quick-nav">
+          <label for="p-rej1" class="quick-btn">← 1-reja: Ikki maqsad</label>
+          <label for="p-rej3" class="quick-btn">3-reja: Uyga vazifa →</label>
+        </div>
+      </div>
+
+      <div class="sub-card">
+        <h2>2-reja: Slayd animatsiyasining turlari va variantlari</h2>
+
+        <input type="radio" name="c2" id="c-turlar" class="conf-radio" checked>
+        <input type="radio" name="c2" id="c-variant" class="conf-radio">
+        <input type="radio" name="c2" id="c-sozlama" class="conf-radio">
+
+        <div class="conf-tabs">
+          <label for="c-turlar" class="conf-tab">✨ ANIMATSIYA TURLARI</label>
+          <label for="c-variant" class="conf-tab">🎛️ EFFEKT VARIANTLARI (EFFECT OPTIONS)</label>
+          <label for="c-sozlama" class="conf-tab">⏱️ BOSHLASH VA DAVOMIYLIK</label>
+        </div>
+
+        <div class="conf-panels">
+          <!-- 1-ichki bo'lim: Turlar -->
+          <div id="cp-turlar" class="conf-box">
+            <table class="diff-tbl">
+              <tr>
+                <th>Animatsiya turi</th>
+                <th>Vazifasi</th>
+                <th>Qo‘llanish misoli</th>
+              </tr>
+              <tr>
+                <td><b>Kirish (Entrance)</b></td>
+                <td>Obyektning slaydga paydo bo‘lish effekti</td>
+                <td>Yangi matn yoki rasmni ekranga chiqarish</td>
+              </tr>
+              <tr>
+                <td><b>Ajratib ko‘rsatish (Emphasis)</b></td>
+                <td>Ekrandagi obyektga qo‘shimcha e’tibor qaratish</td>
+                <td>Muhim so‘z yoki natijani kattalashtirish/tebratish</td>
+              </tr>
+              <tr>
+                <td><b>Chiqish (Exit)</b></td>
+                <td>Obyektning slayddan chiqib ketish effekti</td>
+                <td>Avvalgi izohni yashirib, yangi qismga o‘tish</td>
+              </tr>
+              <tr>
+                <td><b>Harakat yo‘li (Motion Paths)</b></td>
+                <td>Obyektni belgilangan trayektoriya bo‘ylab ko‘chirish</td>
+                <td>Strelka yoki belgini A nuqtadan B nuqtaga olib o‘tish</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- 2-ichki bo'lim: Variantlari -->
+          <div id="cp-variant" class="conf-box">
+            <div class="info-def">
+              Har bir animatsiya turining <b>Effect Options (Параметры эффектов / Effekt variantlari)</b> bo‘limida qo‘shimcha ko‘rinish va yo‘nalish variantlari mavjud.
+            </div>
+            <ul class="info-list">
+              <li><b>Yo‘nalish bo‘yicha:</b> Pastdan, yuqoridan, chapdan, o‘ngdan yoki ichkaridan paydo bo‘lish.</li>
+              <li><b>Tartib bo‘yicha:</b> Matn bloklarini bir butun holda yoki har bir xatboshi/band bo‘yicha alohida chiqarish.</li>
+              <li><b>Shakli bo‘yicha:</b> To‘g‘ri chiziq, yoy, aylana yoki maxsus chizilgan yo‘l bo‘ylab harakatlantirish.</li>
+            </ul>
+            <div class="info-ex">
+              <b>Misol:</b> <i>Fly In (Влет)</i> effektida yo‘nalish variantini <i>From Left (Слева)</i> qilib tanlasangiz, obyekt chap tomondan suzib kiradi.
+            </div>
+          </div>
+
+          <!-- 3-ichki bo'lim: Boshlash va davomiylik -->
+          <div id="cp-sozlama" class="conf-box">
+            <div class="info-def">
+              Animatsiyaning qachon va qanday tezlikda ishlashini <b>Start (Начало)</b>, <b>Duration (Длительность)</b> va <b>Delay (Задержка)</b> parametrlari boshqaradi.
+            </div>
+            <ol class="info-list">
+              <li><b>On Click (По щелчку):</b> Sichqoncha bosilganda yoki tugma bosilganda ishga tushadi.</li>
+              <li><b>With Previous (Вместе с предыдущим):</b> Oldingi animatsiya bilan bir vaqtda boshlanadi.</li>
+              <li><b>After Previous (После предыдущего):</b> Oldingi effekt tugagandan keyin avtomatik davom etadi.</li>
+            </ol>
+            <div class="info-tip">
+              <b>✅ Tavsiya:</b> O‘quv va tushuntirish taqdimotlarida boshqaruvni qo‘lda ushlab turish uchun ko‘pincha <b>On Click</b> qulay bo‘ladi.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 3-REJA SAHIFASI (UYGA VAZIFA) ==================== -->
+    <div id="view-rej3" class="page-view">
+      <div class="top-bar">
+        <label for="p-home" class="back-btn">← Bosh sahifa</label>
+        <div class="quick-nav">
+          <label for="p-rej1" class="quick-btn">← 1-reja</label>
+          <label for="p-rej2" class="quick-btn">← 2-reja</label>
+</div>
+      </div>
+
+      <div class="sub-card">
+        <div class="hw-badge">📚 3-REJA: UYGA VAZIFA</div>
+        <div class="hw-box">
+          <b>UYGA VAZIFA:</b> Kitobingizni <span class="hw-pages">45–47-sahifalarida</span> berilgan mavzuni to‘liq o‘qib-o‘rganib tushunganingizni daftaringizga yozib <span class="hw-muhr">muhrlang</span>.
+        </div>
+
+        <div class="hw-steps">
+          <div class="hw-step">
+            <h4>1-qadam</h4>
+            <p>Darslikning 45–47-sahifalaridagi mavzuni boshidan oxirigacha diqqat bilan o‘qing.</p>
+          </div>
+          <div class="hw-step">
+            <h4>2-qadam</h4>
+            <p>Slayd animatsiyasidan foydalanishning ikki asosiy maqsadini yodda saqlang.</p>
+          </div>
+          <div class="hw-step">
+            <h4>3-qadam</h4>
+            <p>Animatsiya turlari (kirish, ajratish, chiqish, harakat yo‘li) va variantlarini daftaringizga yozing.</p>
+          </div>
+          <div class="hw-step">
+            <h4>4-qadam</h4>
+            <p>Taqdimot dasturida 2–3 slayddan iborat mashq tayyorlab, animatsiya effektlarini sinab ko‘ring.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
